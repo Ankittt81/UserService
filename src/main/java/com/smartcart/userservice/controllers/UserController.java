@@ -32,7 +32,8 @@ public class UserController {
 
     @GetMapping("/validate/{token}")
     public UserDto validate(@PathVariable("token") String token){
-        return null;
+        User user=userService.validateToken(token);
+        return UserDto.from(user);
     }
 
     @PutMapping("/logout")

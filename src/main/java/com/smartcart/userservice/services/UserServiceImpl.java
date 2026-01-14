@@ -6,7 +6,6 @@ import com.smartcart.userservice.models.User;
 import com.smartcart.userservice.repositories.TokenRepository;
 import com.smartcart.userservice.repositories.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,7 @@ public class UserServiceImpl implements UserService {
     public User signup(String name, String email, String password) {
         Optional<User> userOptional=userRepository.findByEmail(email);
         if(userOptional.isPresent()){
-            //Redirect to login
+            //Redirect to log-in
             return userOptional.get();
         }
       //1 way:  User user=userRepository.save(name,email,bCryptPasswordEncoder.encode(password));
@@ -68,7 +67,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User validateToken(String tokenValue) {
-        return null;
+        Optional<Token> tokenOptional=tokenRepository.findTokensByTokenValueAndExpiryAtGreaterThan(tokenValue,new Date());
+        if(tokenOptional.isEmpty()){
+            //Invalid token
+        }
+        Token token=tokenOptional.get();
+        return token.getUser();
     }
 
     @Override
