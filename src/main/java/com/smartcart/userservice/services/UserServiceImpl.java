@@ -3,20 +3,27 @@ package com.smartcart.userservice.services;
 import com.smartcart.userservice.exceptions.PasswordMisMatchException;
 import com.smartcart.userservice.models.Token;
 import com.smartcart.userservice.models.User;
+import com.smartcart.userservice.repositories.TokenRepository;
 import com.smartcart.userservice.repositories.UserRepository;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private BCryptPasswordEncoder  bCryptPasswordEncoder;
+    private TokenRepository tokenRepository;
 
-    public UserServiceImpl(UserRepository userRepository,BCryptPasswordEncoder bCryptPasswordEncoder){
+    public UserServiceImpl(UserRepository userRepository,BCryptPasswordEncoder bCryptPasswordEncoder,TokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -45,8 +52,18 @@ public class UserServiceImpl implements UserService {
         if(!bCryptPasswordEncoder.matches(password,user.getPassword())){
             throw new PasswordMisMatchException("Incorrect Password");
         }
+        //login successful
+        //token generate
+        Token token=new Token();
+        token.setUser(user);
+        token.setTokenValue(RandomStringUtils.randomAlphanumeric(128));
 
-        return null;
+        Calendar  calendar=Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR,30);
+        Date expiryDate=calendar.getTime();
+        token.setExpiryAt(expiryDate);
+
+        return tokenRepository.save(token);
     }
 
     @Override
