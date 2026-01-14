@@ -1,17 +1,24 @@
 package com.smartcart.userservice.controllers;
 
-
-
 import com.smartcart.userservice.dtos.*;
+import com.smartcart.userservice.models.User;
+import com.smartcart.userservice.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
+    private UserService userService;
+
+    public UserController(UserService userService){
+        this.userService=userService;
+    }
 
     @PostMapping("/signup")
     public UserDto signUp(@RequestBody SignUpRequestDto signUpRequestDto){
-        return null;
+        User user= userService.signup(signUpRequestDto.getName(),signUpRequestDto.getEmail(),signUpRequestDto.getPassword());
+
+        return UserDto.from(user);
     }
 
     @PostMapping("/login")
