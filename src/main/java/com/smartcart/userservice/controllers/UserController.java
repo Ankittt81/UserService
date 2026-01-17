@@ -5,10 +5,14 @@ import com.smartcart.userservice.exceptions.PasswordMisMatchException;
 import com.smartcart.userservice.models.Token;
 import com.smartcart.userservice.models.User;
 import com.smartcart.userservice.services.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
     private UserService userService;
 
@@ -24,10 +28,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public TokenDto login(@RequestBody LoginRequestDto loginRequestDto) throws PasswordMisMatchException {
-        Token token=userService.login(loginRequestDto.getEmail(),loginRequestDto.getPassword());
-
-        return TokenDto.from(token);
+    public String login(@RequestBody LoginRequestDto loginRequestDto) throws PasswordMisMatchException {
+        String token=userService.login(loginRequestDto.getEmail(),loginRequestDto.getPassword());
+        return token;
+       // return TokenDto.from(token);
     }
 
     @GetMapping("/validate/{token}")
@@ -36,8 +40,15 @@ public class UserController {
         return UserDto.from(user);
     }
 
-    @PutMapping("/logout")
-    public UserDto logout(@RequestBody LogoutRequestDto logoutRequestDto){
-        return null;
+    @Transactional
+    @PostMapping("/logout")
+    public ResponseEntity<LogOutResponseDto> logout(@RequestBody LogoutRequestDto logoutRequestDto){
+        Token user=userService.logOut(logoutRequestDto.getTokenValue());
+        LogOutResponseDto logOutResponseDto=new LogOutResponseDto();
+        if(user==null){
+            logOutResponseDto.setMessage("Already logged Out!");
+        }
+        else logOutResponseDto.setMessage("Logged Out!");
+        return ResponseEntity.ok (logOutResponseDto);
     }
 }

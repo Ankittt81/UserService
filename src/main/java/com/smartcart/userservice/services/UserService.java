@@ -8,9 +8,10 @@ import com.smartcart.userservice.models.User;
 public interface UserService {
    User signup(String name,String email,String password);
 
-   Token login(String email,String password) throws PasswordMisMatchException;
+   String login(String email,String password) throws PasswordMisMatchException;
 
    User validateToken(String tokenValue);
 
-   User logout(String email);
+   Token logout(String tokenValue);
+    Token logOut(String tokenValue);
 }
