@@ -1,6 +1,5 @@
-package com.smartcart.userservice.config;
+package com.smartcart.userservice.security;
 
-import com.smartcart.userservice.security.JwtFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

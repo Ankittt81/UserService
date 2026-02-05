@@ -10,12 +10,12 @@ import com.smartcart.userservice.models.User;
 import com.smartcart.userservice.repositories.RoleRepository;
 import com.smartcart.userservice.repositories.TokenRepository;
 import com.smartcart.userservice.repositories.UserRepository;
-import com.smartcart.userservice.utils.JwtUtil;
+import com.smartcart.userservice.security.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.apache.commons.lang3.RandomStringUtils;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,15 +28,15 @@ public class UserServiceImpl implements UserService {
     private TokenRepository tokenRepository;
     private UserMapper userMapper;
     private RoleRepository roleRepository;
-    private JwtUtil  jwtUtil;
+    private JwtService jwtService;
 
-    public UserServiceImpl(UserRepository userRepository,BCryptPasswordEncoder bCryptPasswordEncoder,TokenRepository tokenRepository,UserMapper userMapper,RoleRepository roleRepository,JwtUtil jwtUtil) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenRepository tokenRepository, UserMapper userMapper, RoleRepository roleRepository, JwtService jwtService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.tokenRepository = tokenRepository;
         this.userMapper = userMapper;
         this.roleRepository = roleRepository;
-        this.jwtUtil = jwtUtil;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(String email, String password)  {
+    public String login(String email, String password, HttpServletResponse response)  {
         Optional<User> userOptional=userRepository.findByEmail(email);
         if(userOptional.isEmpty()){
             //redirect to signup
@@ -102,7 +102,14 @@ public class UserServiceImpl implements UserService {
 //        claims.put("roles",user.getRoles());
 //        String token=Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS256,"AuthService").compact();
 
-        return jwtUtil.generateToken(user);
+        String token= jwtService.generateToken(user);
+        Cookie cookie=new Cookie("access_token",token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        return new String("Login Successful"+token);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.smartcart.userservice.security;
 
-import com.smartcart.userservice.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,10 +11,10 @@ import java.io.IOException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter{
-    private JwtUtil  jwtUtil;
+    private JwtService jwtService;
 
-    public JwtFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
+    public JwtFilter(JwtService jwtService) {
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -38,7 +37,7 @@ public class JwtFilter extends OncePerRequestFilter{
 
         try{
             // 4️⃣ VALIDATION happens here
-            jwtUtil.validateToken(token);
+            jwtService.validateToken(token);
 
             // 5️⃣ If no exception → token is valid
             // Move to controller

@@ -1,4 +1,4 @@
-package com.smartcart.userservice.utils;
+package com.smartcart.userservice.security;
 
 import com.smartcart.userservice.models.Role;
 import com.smartcart.userservice.models.User;
@@ -12,7 +12,7 @@ import java.security.Key;
 import java.util.Date;
 
 @Component
-public class JwtUtil {
+public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
@@ -43,8 +43,5 @@ public class JwtUtil {
                 .setSigningKey(getSecretKey())
                 .parseClaimsJws(token)//validation happens here
                 .getBody();
-
-
-
     }
 }

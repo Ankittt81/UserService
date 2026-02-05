@@ -14,14 +14,14 @@ public class ApplicationConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf(csrf -> csrf.disable())
-                   .cors(cors -> cors.disable());
-        httpSecurity.authorizeHttpRequests(
-                authorize -> authorize.anyRequest().permitAll()
-        );
-
-        return httpSecurity.build();
-    }
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+//        httpSecurity.csrf(csrf -> csrf.disable())
+//                   .cors(cors -> cors.disable());
+//        httpSecurity.authorizeHttpRequests(
+//                authorize -> authorize.anyRequest().permitAll()
+//        );
+//
+//        return httpSecurity.build();
+//   }
 }
