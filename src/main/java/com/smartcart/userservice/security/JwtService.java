@@ -38,10 +38,12 @@ public class JwtService {
     }
 
     //claim is key-value pair data type data structure (HashMap)
-    public Claims validateToken(String token){
-        return Jwts.parser()
+    public Long validateToken(String token){
+        Claims claim= Jwts.parser()
                 .setSigningKey(getSecretKey())
                 .parseClaimsJws(token)//validation happens here
                 .getBody();
+        //return claim.get("userId", Long.class);
+        return Long.valueOf(String.valueOf(claim.get("userId")));
     }
 }

@@ -5,6 +5,7 @@ import com.smartcart.userservice.exceptions.PasswordMisMatchException;
 import com.smartcart.userservice.models.Token;
 import com.smartcart.userservice.models.User;
 import com.smartcart.userservice.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequestDto loginRequestDto) throws PasswordMisMatchException {
-        String token=userService.login(loginRequestDto.getEmail(),loginRequestDto.getPassword());
+    public String login(@RequestBody LoginRequestDto loginRequestDto,HttpServletResponse response) throws PasswordMisMatchException {
+        String token=userService.login(loginRequestDto.getEmail(),loginRequestDto.getPassword(),response);
         return token;
        // return TokenDto.from(token);
     }

@@ -13,6 +13,5 @@ public interface UserService {
 
    User validateToken(String tokenValue);
 
-   Token logout(String tokenValue);
-    Token logOut(String tokenValue);
+    Token logout(String tokenValue);
 }
