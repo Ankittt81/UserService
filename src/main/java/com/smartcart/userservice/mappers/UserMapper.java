@@ -1,5 +1,6 @@
 package com.smartcart.userservice.mappers;
 
+import com.smartcart.userservice.dtos.UserDto;
 import com.smartcart.userservice.models.Role;
 import com.smartcart.userservice.models.Status;
 import com.smartcart.userservice.models.User;
@@ -18,5 +19,18 @@ public class UserMapper {
         user.setRoles(roles);
         user.setStatus(Status.ACTIVE);
         return user;
+    }
+
+    public UserDto toDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setUserId(user.getId());
+        userDto.setName(user.getName());
+        userDto.setEmail(user.getEmail());
+        userDto.setRoles(user.getRoles()
+                .stream()
+                .map(role ->role.getName())
+                .toList());
+        return userDto;
+
     }
 }

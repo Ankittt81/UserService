@@ -2,6 +2,7 @@ package com.smartcart.userservice.controllers;
 
 import com.smartcart.userservice.dtos.*;
 import com.smartcart.userservice.exceptions.PasswordMisMatchException;
+import com.smartcart.userservice.mappers.UserMapper;
 import com.smartcart.userservice.models.Token;
 import com.smartcart.userservice.models.User;
 import com.smartcart.userservice.services.UserService;
@@ -16,16 +17,18 @@ import java.util.Optional;
 @RequestMapping("/auth")
 public class UserController {
     private UserService userService;
+    private UserMapper  userMapper;
 
-    public UserController(UserService userService){
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService=userService;
+        this.userMapper=userMapper;
     }
 
     @PostMapping("/signup")
     public UserDto signUp(@RequestBody SignUpRequestDto signUpRequestDto){
         User user= userService.signup(signUpRequestDto.getName(),signUpRequestDto.getEmail(),signUpRequestDto.getPassword());
 
-        return UserDto.from(user);
+        return userMapper.toDto(user);
     }
 
     @PostMapping("/login")
@@ -38,13 +41,13 @@ public class UserController {
     @GetMapping("/validate/{token}")
     public UserDto validate(@PathVariable("token") String token){
         User user=userService.validateToken(token);
-        return UserDto.from(user);
+        return userMapper.toDto(user);
     }
 
     @Transactional
     @PostMapping("/logout")
     public ResponseEntity<LogOutResponseDto> logout(@RequestBody LogoutRequestDto logoutRequestDto){
-        Token user=userService.logOut(logoutRequestDto.getTokenValue());
+        Token user=userService.logout(logoutRequestDto.getTokenValue());
         LogOutResponseDto logOutResponseDto=new LogOutResponseDto();
         if(user==null){
             logOutResponseDto.setMessage("Already logged Out!");

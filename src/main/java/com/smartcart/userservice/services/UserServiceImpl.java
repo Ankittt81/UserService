@@ -74,12 +74,13 @@ public class UserServiceImpl implements UserService {
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        return new String("Login Successful"+token);
+        return new String("Login Successfull "+token);
     }
 
     @Override
     public User validateToken(String tokenValue) {
-        Long userId=jwtService.validateToken(tokenValue);
+        Claims claims =jwtService.validateToken(tokenValue);
+        Long userId=Long.valueOf(claims.get("userId").toString());
         Optional<User> userOptional=userRepository.findById(userId);
         if(userOptional.isEmpty()){
             throw new UserNotFoundException();
