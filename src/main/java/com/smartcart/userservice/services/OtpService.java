@@ -1,17 +1,13 @@
 package com.smartcart.userservice.services;
 
-import com.smartcart.userservice.events.ResetPasswordEvent;
-import com.smartcart.userservice.exceptions.UserNotFoundException;
+
 import com.smartcart.userservice.mappers.OtpMapper;
 import com.smartcart.userservice.models.PasswordResetToken;
-import com.smartcart.userservice.models.User;
 import com.smartcart.userservice.repositories.PasswordResetTokenRepository;
-import com.smartcart.userservice.repositories.UserRepository;
 import com.smartcart.userservice.util.OtpUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -43,6 +39,7 @@ public class OtpService {
                 throw new RuntimeException("Please wait before requesting OTP again");
             }
         }
+        passwordResetTokenRepository.deleteByEmail(email);
         String otp= OtpUtil.generateOtp(6);
         String hashOtp=bCryptPasswordEncoder.encode(otp);
         PasswordResetToken passwordResetToken= otpMapper.toEntity(email,hashOtp);

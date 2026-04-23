@@ -1,15 +1,18 @@
 package com.smartcart.userservice.services;
 
+import com.smartcart.userservice.dtos.LoginRequestDto;
+import com.smartcart.userservice.dtos.SignUpRequestDto;
+import com.smartcart.userservice.dtos.UserDto;
 import com.smartcart.userservice.events.ResetPasswordEvent;
 import com.smartcart.userservice.exceptions.PasswordMisMatchException;
 import com.smartcart.userservice.exceptions.UserAlreadyExistException;
 import com.smartcart.userservice.exceptions.UserNotFoundException;
 import com.smartcart.userservice.mappers.UserMapper;
 import com.smartcart.userservice.models.Role;
-import com.smartcart.userservice.models.Token;
+
 import com.smartcart.userservice.models.User;
 import com.smartcart.userservice.repositories.RoleRepository;
-import com.smartcart.userservice.repositories.TokenRepository;
+
 import com.smartcart.userservice.repositories.UserRepository;
 import com.smartcart.userservice.security.JwtService;
 import io.jsonwebtoken.Claims;
@@ -24,7 +27,7 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private BCryptPasswordEncoder  bCryptPasswordEncoder;
-    private TokenRepository tokenRepository;
+
     private UserMapper userMapper;
     private RoleRepository roleRepository;
     private JwtService jwtService;
@@ -33,12 +36,12 @@ public class UserServiceImpl implements UserService {
 
 
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
-                           TokenRepository tokenRepository, UserMapper userMapper,
+                           UserMapper userMapper,
                            RoleRepository roleRepository, JwtService jwtService,KafkaProducerService kafkaProducerService,
                            OtpService otpService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.tokenRepository = tokenRepository;
+
         this.userMapper = userMapper;
         this.roleRepository = roleRepository;
         this.jwtService = jwtService;
@@ -47,30 +50,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User signup(String name, String email, String password) {
-        Optional<User> userOptional=userRepository.findByEmail(email);
+    public UserDto signup(SignUpRequestDto dto) {
+
+        Optional<User> userOptional=userRepository.findByEmail(dto.getEmail());
         if(userOptional.isPresent()){
             //Redirect to log-in
             throw new UserAlreadyExistException("User already exists");
         }
       //1 way:  User user=userRepository.save(name,email,bCryptPasswordEncoder.encode(password));
         Role userRole=roleRepository.findByName("ROLE_USER").orElseThrow(() -> new RuntimeException("ROLE_USER not found"));
-        String hashPassword=bCryptPasswordEncoder.encode(password);
+        String hashPassword=bCryptPasswordEncoder.encode(dto.getPassword());
         Set<Role> roles=new HashSet<>();
         roles.add(userRole);
-        User user=userMapper.toEntity(name,email,hashPassword,roles);
-        return userRepository.save(user);
+        User user=userMapper.toEntity(dto.getName(), dto.getEmail(), hashPassword,roles);
+        User savedUser=userRepository.save(user);
+        return userMapper.toDto(savedUser);
     }
 
     @Override
-    public String login(String email, String password, HttpServletResponse response)  {
-        Optional<User> userOptional=userRepository.findByEmail(email);
-        if(userOptional.isEmpty()){
-            //redirect to signup
-            throw new UserNotFoundException();
-        }
-        User user=userOptional.get();
-        if(!bCryptPasswordEncoder.matches(password,user.getPassword())){
+    public String login(LoginRequestDto dto, HttpServletResponse response)  {
+        User user=userRepository.findByEmail(dto.getEmail()).orElseThrow(()-> new UserNotFoundException("User not found with email: "+dto.getEmail()));
+
+        if(!bCryptPasswordEncoder.matches(dto.getPassword(), user.getPassword())){
             throw new PasswordMisMatchException("Incorrect Password");
         }
 
@@ -136,16 +137,16 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    @Override
-    //1-way
-    public Token logout(String tokenValue) {
-        Optional<Token> tokenOptional = tokenRepository.findByTokenValue(tokenValue);
-        if (tokenOptional.isEmpty()) {
-            //Already logout
-            return null;
-        }
-        Token token = tokenOptional.get();
-
-        return tokenRepository.deleteTokenById(token.getId());
-    }
+//    @Override
+//    //1-way
+//    public Token logout(String tokenValue) {
+//        Optional<Token> tokenOptional = tokenRepository.findByTokenValue(tokenValue);
+//        if (tokenOptional.isEmpty()) {
+//            //Already logout
+//            return null;
+//        }
+//        Token token = tokenOptional.get();
+//
+//        return tokenRepository.deleteTokenById(token.getId());
+//    }
 }

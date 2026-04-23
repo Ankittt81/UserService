@@ -28,7 +28,9 @@ public class JwtService {
         return Jwts.builder().          //for building jwt token it builds
                 setSubject(user.getEmail()). //Identifies WHO this token belongs to // Usually email or username
                 claim("userId", user.getId()).
-                claim("roles", user.getRoles().    // Collection of Role entities  //claim is custom for storing any piece of info
+                claim("username",user.getName()).
+                claim("roles", user.getRoles(). // Collection of Role entities  //claim is custom for storing any piece of info
+
                         stream().
                         map(Role::getName).                    // Convert Role → "ROLE_USER", "ROLE_ADMIN"
                                 toList()).                      // Convert stream → List<String>
