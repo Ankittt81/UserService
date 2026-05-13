@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        return new String("Login Successfull "+token);
+        return new String(token);
     }
 
     public void resetPasswordRequest(String email){
@@ -123,6 +123,13 @@ public class UserServiceImpl implements UserService {
         user.setPassword(bCryptPasswordEncoder.encode(newPassword));
         userRepository.save(user);
 
+    }
+
+    @Override
+    public UserDto userDetails(Long userId) {
+        User user=userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with id: "+userId));
+        UserDto userDto=userMapper.toDto(user);
+        return userDto;
     }
 
     @Override

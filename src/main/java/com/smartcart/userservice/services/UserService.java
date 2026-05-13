@@ -20,4 +20,5 @@ public interface UserService {
     void resetPasswordRequest(String email);
     void checkOtp(String email,String otp);
     void resetPasswordConfirm(String email,String newPassword);
+    UserDto userDetails(Long userId);
 }

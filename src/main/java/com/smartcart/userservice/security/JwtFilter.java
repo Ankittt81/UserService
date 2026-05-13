@@ -25,8 +25,15 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().startsWith("/auth/");
+    protected boolean shouldNotFilter(
+            HttpServletRequest request
+    ) {
+
+        String path = request.getServletPath();
+
+        return path.equals("/auth/login")
+                || path.equals("/auth/signup")
+                || path.startsWith("/auth/reset-password");
     }
 
     @Override
@@ -50,16 +57,17 @@ public class JwtFilter extends OncePerRequestFilter {
             Claims claims = jwtService.validateToken(token);
 
             String email = claims.getSubject();
+            Long userId = claims.get("userId", Long.class);
             List<String> roles = claims.get("roles", List.class);
 
 
             var authorities = roles.stream()
                     .map(role -> new SimpleGrantedAuthority(role))
                     .toList();
-
+            var principal=new CustomUserPrincipal(userId,email);
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            email, null, authorities
+                            principal, null, authorities
                     );
 
             SecurityContextHolder.getContext()

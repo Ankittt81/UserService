@@ -19,6 +19,7 @@ public class User extends  BaseModel{
     private Set<Role> roles;
     @Enumerated(EnumType.STRING)
     private Status status;
+    private List<String> addresses;
 }
 
 

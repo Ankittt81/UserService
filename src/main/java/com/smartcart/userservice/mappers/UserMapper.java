@@ -30,6 +30,8 @@ public class UserMapper {
                 .stream()
                 .map(role ->role.getName())
                 .toList());
+        userDto.setStatus(user.getStatus());
+        userDto.setAddresses(user.getAddresses());
         return userDto;
 
     }

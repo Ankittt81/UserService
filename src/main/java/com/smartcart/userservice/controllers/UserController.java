@@ -5,9 +5,11 @@ import com.smartcart.userservice.exceptions.PasswordMisMatchException;
 import com.smartcart.userservice.mappers.UserMapper;
 
 import com.smartcart.userservice.models.User;
+import com.smartcart.userservice.security.CustomUserPrincipal;
 import com.smartcart.userservice.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,5 +73,11 @@ public class UserController {
     public ResponseEntity<String> resetPasswordConfirm(@RequestBody  ResetPasswordDto dto){
         userService.resetPasswordConfirm(dto.getEmail(), dto.getNewPassword());
         return ResponseEntity.ok("Password has been reset!");
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse> userDetails(@AuthenticationPrincipal CustomUserPrincipal user){
+        UserDto userDto= userService.userDetails(user.getUserId());
+        return ResponseEntity.ok(new ApiResponse("Success ",userDto));
     }
 }
