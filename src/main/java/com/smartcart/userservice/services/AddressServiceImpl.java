@@ -7,6 +7,7 @@ import com.smartcart.userservice.models.Address;
 import com.smartcart.userservice.models.User;
 import com.smartcart.userservice.repositories.AddressRepository;
 import com.smartcart.userservice.repositories.UserRepository;
+import com.smartcart.userservice.security.CustomUserPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,18 @@ public class AddressServiceImpl implements AddressService {
         List<Address> addresses=addressRepository.findByUser(user);
         List<AddressResponseDto> responses= addresses.stream().map(address -> addressMapper.toDto(address)).toList();
         return responses;
+    }
+
+    @Override
+    public AddressResponseDto getAddressById(CustomUserPrincipal principal, Long addressId) {
+        Address  address=addressRepository.findById(addressId).orElseThrow(()->new RuntimeException("Address Not found"));
+        //Role Check
+        boolean isAdmin=principal.getRoles().contains("ROLE_ADMIN");
+        //OwnerShip Validation
+        if(!isAdmin  && !address.getUser().getId().equals(principal.getUserId())){
+            throw new RuntimeException("Unauthorized Access");
+        }
+        return addressMapper.toDto(address);
     }
 
     @Override

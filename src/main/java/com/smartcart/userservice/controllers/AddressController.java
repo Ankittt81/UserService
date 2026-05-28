@@ -33,6 +33,12 @@ public class AddressController {
         return ResponseEntity.ok(new ApiResponse("Success ",response));
     }
 
+    @GetMapping("/{addressId}")
+    public ResponseEntity<ApiResponse> getAddressById(@AuthenticationPrincipal CustomUserPrincipal principal,@PathVariable Long addressId){
+        AddressResponseDto response=addressService.getAddressById(principal,addressId);
+        return ResponseEntity.ok(new ApiResponse("Success ",response));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteAddress(@PathVariable Long id){
         addressService.deleteAddress(id);

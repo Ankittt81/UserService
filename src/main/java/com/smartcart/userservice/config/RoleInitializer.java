@@ -19,6 +19,7 @@ public class RoleInitializer {
     public void init() {
         createRoleIfNotExists("ROLE_USER");
         createRoleIfNotExists("ROLE_ADMIN");
+        createRoleIfNotExists("ROLE_SELLER");
 
     }
 
